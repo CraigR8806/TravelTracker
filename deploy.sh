@@ -20,7 +20,7 @@ deploy_container() {
     cd "$this_dir"
     
     ssh $user@$server_ip "chmod 700 /home/$user/api-build/$container/run.sh"
-    ssh $user@$server_ip -t "/home/$user/api-build/$container/run.sh $version"
+    ssh $user@$server_ip -t "/home/$user/api-build/$container/run.sh $version $user"
     ssh $user@$server_ip "rm -rf /home/$user/api-build/$container"
 
 }
