@@ -43,11 +43,21 @@ class HomePage extends React.Component<HomePageProps, HomePageState> {
       this.setState({"user":getLoggedInUser()}, ()=> {
         getTravelClient().getAllTravel().then(data=>{
           let travelCountries:(string|undefined)[] = data.map(travel=>travel.country);
+          let travelStates:(string|undefined)[] = data.filter(travel=>travel.country === "USA").map(travel=>travel.state);
           this.setState({
             "selectedCountries":featureCollectionFromListOfFeatures(
               countries.features.filter(
-                country=>travelCountries.indexOf(country.id)>-1) as Feature[])
+                country=>travelCountries.indexOf(country.id)>-1 && country.id !== "USA") as Feature[])
           });
+          if(travelCountries.indexOf("USA") > -1) {
+              this.setState({
+                "selectedStates":featureCollectionFromListOfFeatures(
+                  usStates.features.filter(
+                    state => travelStates.indexOf(state.id) > -1) as Feature[]
+                  )
+              });
+          }
+          
         }).catch(e=>
           console.log(e)
         );
