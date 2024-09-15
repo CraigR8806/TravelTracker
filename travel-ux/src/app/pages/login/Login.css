@@ -1,0 +1,16 @@
+.loginContainer {
+
+    color:white;
+    width:40%;
+    padding-left:35%;
+    padding-right:35%;
+    padding-top:10%;
+    width:100%;
+}
+.loginWindow {
+    background-color:#2F394D;
+    padding:5%;
+}
+.loginButton {
+    width:100%;
+}

@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.travel</groupId>
+    <artifactId>travel</artifactId>
+    <version>${project-version}</version>
+
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>travel-api</module>
+        <module>travel-impl</module>
+    </modules>
+
+    <properties>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+        <springboot.version>3.3.3</springboot.version>
+        <log4jdbc.log4j2.version>1.16</log4jdbc.log4j2.version>
+        <project-version>1.0-SNAPSHOT</project-version>
+        <jakarta.persistence.version>3.1.0</jakarta.persistence.version>
+    </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>2.6</version>
+                <executions>
+                    <execution>
+                        <id>copy-typescript-model</id>
+                        <phase>install</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.basedir}/travel-ux/src/app/data/generated/models</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${project.basedir}/travel-api/target/typescript/models</directory>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>copy-typescript-api</id>
+                        <phase>install</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.basedir}/travel-ux/src/app/data/generated/apis</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${project.basedir}/travel-api/target/typescript/apis</directory>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>copy-typescript-support</id>
+                        <phase>install</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.basedir}/travel-ux/src/app/data/generated</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${project.basedir}/travel-api/target/typescript/</directory>
+                                    <includes>
+                                        <include>runtime.ts</include>
+                                        <include>index.ts</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

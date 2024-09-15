@@ -1,0 +1,18 @@
+.travelFromFileContainer {
+    color:white;
+    width:40%;
+    padding-left:35%;
+    padding-right:35%;
+    padding-top:10%;
+    width:100%;
+}
+.travelFromFileWindow {
+    background-color:#2F394D;
+    padding:5%;
+}
+.travelFromFileHeader {
+    text-align: center;
+}
+.uploadButton {
+    width:100%;
+}

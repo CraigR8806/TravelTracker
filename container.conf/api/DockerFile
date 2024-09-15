@@ -1,0 +1,4 @@
+FROM docker.io/openjdk:17-slim-bullseye
+ARG version
+COPY travel-impl-${version}-jar-with-dependencies.jar app.jar
+ENTRYPOINT ["java","-jar","/app.jar"]

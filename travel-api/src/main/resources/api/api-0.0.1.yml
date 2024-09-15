@@ -1,0 +1,587 @@
+openapi: 3.0.3
+info:
+  title: Travel Map 0.0.1
+  description: |-
+    This is an api to interface with a database containing travel information
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 0.0.1
+servers:
+  - url: http://dev:8080/
+tags:
+  - name: users
+    description: Access to user information
+  - name: travel
+    description: Access to travel information
+paths:
+  /user:
+    post:
+      tags:
+        - users
+      summary: Upsert a user
+      description: Upsert a user by Id
+      operationId: upsertUser
+      requestBody:
+        description: User to upsert
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/User'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/User'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'          
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/User'
+        '409':
+          description: User already exists
+        '400':
+          description: Invalid User object supplied
+        '422':
+          description: Validation exception
+      security:
+        - api_key: []
+    get:
+      tags:
+        - users
+      summary: Gets a list of all Users
+      description: Gets a list of all Users
+      operationId: getAllUsers
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'       
+            application/xml:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'   
+      security:
+        - api_key: []
+
+  /user/refreshToken:
+    get:
+      tags:
+        - users
+      summary: Refreshes a user api key.  API key must be provided in api_key header
+      description: |-
+        Attempts to refresh a user api key.  API key must be provided in api_key header
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiKeyResponse'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ApiKeyResponse'
+                
+  /user/login:
+    post:
+      tags:
+        - users
+      summary: Attempts to log in a user
+      description: |-
+        Attempts to a log a user in.  If successful, will return an API key
+        to be used with subsiquint requests to the API.  This API key will
+        expire in a set amount of time and the client will need to call
+        login again to receive a new API key.
+      requestBody:
+        description: Login Attempt
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/User'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/User'
+        required: true
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiKeyResponse'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ApiKeyResponse'
+
+  /user/{id}:
+    get:
+      tags:
+        - users
+      summary: Find User by Id
+      description: Find User by Id
+      operationId: findUserById
+      parameters:
+        - name: id
+          in: path
+          description: The user Id
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'          
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/User'
+        '404':
+          description: User not found
+      security:
+        - api_key: []
+
+  /travel:
+    get:
+      tags:
+        - travel
+      summary: Gets all travel records
+      operationId: getAllTravel
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Travel'       
+            application/xml:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Travel' 
+      security:
+        - api_key: []
+    post:
+      tags:
+        - travel
+      summary: Upserts a Travel object
+      operationId: upsertTravelRecord
+      requestBody:
+        description: Travel to upsert
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Travel'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/Travel'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Travel'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Travel'          
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Travel'
+        '400':
+          description: Invalid Travel object supplied
+        '422':
+          description: Validation exception
+      security:
+        - api_key: []
+
+  /travel/{userId}:
+    get:
+      tags:
+        - travel
+      summary: Returns a list of all travel records linked to a user
+      description: Returns a list of all travel records linked to a user
+      operationId: getUserTravel
+      parameters:
+        - name: userId
+          in: path
+          description: The user Id
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Travel'       
+            application/xml:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Travel' 
+      security:
+        - api_key: []
+  
+components:
+  schemas:
+    ApiKeyResponse:
+      type: object
+      properties:
+        apiKey:
+          type: string
+        apiKeyExpiration:
+          type: string
+          format: datetime
+        apiKeyRefreshExpiration:
+          type: string
+          format: datetime
+    User:
+      x-java-jpa-entity: true
+      x-class-extra-annotation: |-
+        @jakarta.persistence.Entity 
+        @jakarta.persistence.Table(name="_user")
+      type: object
+      properties:
+        id:
+          x-field-extra-annotation: |-
+            @jakarta.persistence.Id 
+            @jakarta.persistence.GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY) 
+            @jakarta.persistence.Column(name="_id", nullable=false)
+          type: integer
+          format: int64
+        username:
+          x-field-extra-annotation: |-
+            @jakarta.persistence.Column(unique=true, nullable=false)
+          type: string
+        email:
+          x-field-extra-annotation: |-
+            @jakarta.persistence.Column(unique=true, nullable=false)
+          type: string
+          maxLength: 128
+        password:
+          x-field-extra-annotation: |-
+            @jakarta.persistence.Column(nullable=false)
+          type: string
+          maxLength: 128
+        activeApiKey:
+          x-field-extra-annotation: |-
+            @jakarta.persistence.Column(nullable=true)
+          type: string
+          maxLength: 40
+        apiKeyExpires:
+          x-field-extra-annotation: |-
+            @jakarta.persistence.Column(nullable=true)
+          type: string
+          format: datetime
+        apiKeyRefreshExpiration:
+          x-field-extra-annotation: |-
+            @jakarta.persistence.Column(nullable=true)
+          type: string
+          format: datetime
+      required:
+        - username
+      xml:
+        name: User
+    Travel:
+      x-class-extra-annotation: |-
+        @jakarta.persistence.Entity 
+        @jakarta.persistence.Table(name="_travel")
+      type: object
+      properties:
+        id:
+          x-field-extra-annotation: |-
+            @jakarta.persistence.Id 
+            @jakarta.persistence.GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY) 
+            @jakarta.persistence.Column(name="_id")
+          type: integer
+          format: int64
+        location:
+          type: string
+        dateStart:
+          type: string
+          format: date-time
+        dateEnd:
+          type: string
+          format: date-time
+        transportationInformation:
+          x-field-extra-annotation: |-
+            @jakarta.persistence.OneToOne(cascade = jakarta.persistence.CascadeType.ALL)
+            @jakarta.persistence.JoinColumn(name = "transportationInfoId")
+          allOf:
+            - $ref: '#/components/schemas/TransportationInformation'
+          type: object
+        user:
+          x-field-extra-annotation: |-
+            @jakarta.persistence.ManyToOne()
+            @jakarta.persistence.JoinColumn(name = "userId")
+          type: object
+          allOf:
+            - $ref: "#/components/schemas/User"
+        lodgingInformation:
+          x-field-extra-annotation: |-
+            @jakarta.persistence.OneToOne(cascade = jakarta.persistence.CascadeType.ALL)
+            @jakarta.persistence.JoinColumn(name = "lodgingInfoId")
+          allOf:
+            - $ref: '#/components/schemas/LodgingInformation'
+          type: object
+        foodInformation:
+          x-field-extra-annotation: |-
+            @jakarta.persistence.OneToOne(cascade = jakarta.persistence.CascadeType.ALL)
+            @jakarta.persistence.JoinColumn(name = "foodInfoId")
+          allOf:
+            - $ref: '#/components/schemas/FoodInformation'
+          type: object
+        miscInformation:
+          x-field-extra-annotation: |-
+            @jakarta.persistence.OneToOne(cascade = jakarta.persistence.CascadeType.ALL)
+            @jakarta.persistence.JoinColumn(name = "miscInfoId")
+          allOf:
+            - $ref: '#/components/schemas/MiscellaneousInformation'
+          type: object
+      xml:
+        name: Travel
+    
+    TravelChargeRecord:
+      type: object
+      properties:
+        cost:
+          type: number
+          format: double
+        personal:
+          description:
+            Percentage of cost paid by user
+          type: number
+          format: double
+        company:
+          description:
+            Percentage of cost paid by company
+          type: number
+          format: double
+
+
+    TransportationRecord:
+      x-class-extra-annotation: |-
+        @jakarta.persistence.Entity
+        @jakarta.persistence.Table(name="_transportation_record")
+      allOf:
+        - $ref: '#/components/schemas/TravelChargeRecord'
+        - type: object
+          properties:
+            id:
+              x-field-extra-annotation: |-
+                @jakarta.persistence.Id
+                @jakarta.persistence.GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY) 
+                @jakarta.persistence.Column(name="_id")
+              type: integer
+              format: int64
+            transportationType:
+              type: string
+              enum:
+                - Airplane
+                - Train
+                - Car
+            info:
+              type: object
+              x-field-extra-annotation: |-
+                @jakarta.persistence.ManyToOne(fetch = jakarta.persistence.FetchType.LAZY)
+                @com.fasterxml.jackson.annotation.JsonBackReference
+              allOf:
+                - $ref: '#/components/schemas/TransportationInformation'
+
+    LodgingRecord:
+      x-class-extra-annotation: |-
+        @jakarta.persistence.Entity
+        @jakarta.persistence.Table(name="_lodging_record")
+      allOf:
+        - $ref: '#/components/schemas/TravelChargeRecord'
+        - type: object
+          properties:
+            id:
+              x-field-extra-annotation: |-
+                @jakarta.persistence.Id
+                @jakarta.persistence.GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY) 
+                @jakarta.persistence.Column(name="_id")
+              type: integer
+              format: int64
+            lodgingName:
+              type: string
+            info:
+              type: object
+              x-field-extra-annotation: |-
+                @jakarta.persistence.ManyToOne(fetch = jakarta.persistence.FetchType.LAZY)
+                @com.fasterxml.jackson.annotation.JsonBackReference
+              allOf:
+                - $ref: '#/components/schemas/LodgingInformation'
+    
+    FoodRecord:
+      x-class-extra-annotation: |-
+        @jakarta.persistence.Entity
+        @jakarta.persistence.Table(name="_food_record")
+      allOf:
+        - $ref: '#/components/schemas/TravelChargeRecord'
+        - type: object
+          properties:
+            id:
+              x-field-extra-annotation: |-
+                @jakarta.persistence.Id
+                @jakarta.persistence.GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY) 
+                @jakarta.persistence.Column(name="_id")
+              type: integer
+              format: int64
+            merchentName:
+              type: string
+            info:
+              type: object
+              x-field-extra-annotation: |-
+                @jakarta.persistence.ManyToOne(fetch = jakarta.persistence.FetchType.LAZY)
+                @com.fasterxml.jackson.annotation.JsonBackReference
+              allOf:
+                - $ref: '#/components/schemas/FoodInformation'
+                
+    MiscellaneousRecord:
+      x-class-extra-annotation: |-
+        @jakarta.persistence.Entity 
+        @jakarta.persistence.Table(name="_misc_record")
+      allOf:
+        - $ref: '#/components/schemas/TravelChargeRecord'
+        - type: object
+          properties:
+            id:
+              x-field-extra-annotation: |-
+                @jakarta.persistence.Id
+                @jakarta.persistence.GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY) 
+                @jakarta.persistence.Column(name="_id")
+              type: integer
+              format: int64
+            chargeName:
+              type: string
+            info:
+              type: object
+              x-field-extra-annotation: |-
+                @jakarta.persistence.ManyToOne(fetch = jakarta.persistence.FetchType.LAZY)
+                @com.fasterxml.jackson.annotation.JsonBackReference
+              allOf:
+                - $ref: '#/components/schemas/MiscellaneousInformation'
+
+
+              # @jakarta.persistence.JoinColumn(name = "info_id", referencedColumnName="_id")
+              
+    TransportationInformation:
+      x-class-extra-annotation: |-
+        @jakarta.persistence.Entity 
+        @jakarta.persistence.Table(name="_transportation_info")
+      type: object
+      properties:
+        id:
+          x-field-extra-annotation: |-
+            @jakarta.persistence.Id
+            @jakarta.persistence.GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY) 
+            @jakarta.persistence.Column(name="_id")
+          type: integer
+          format: int64
+        charges:
+          x-field-extra-annotation: |-
+            @jakarta.persistence.Column(name="charges")
+            @jakarta.persistence.OneToMany(mappedBy = "info", cascade = jakarta.persistence.CascadeType.ALL)
+            @com.fasterxml.jackson.annotation.JsonManagedReference
+          type: array
+          items:
+            $ref: '#/components/schemas/TransportationRecord'
+            
+    LodgingInformation:
+      x-class-extra-annotation: |-
+        @jakarta.persistence.Entity 
+        @jakarta.persistence.Table(name="_lodging_info")
+      type: object
+      properties:
+        id:
+          x-field-extra-annotation: |-
+            @jakarta.persistence.Id
+            @jakarta.persistence.GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY) 
+            @jakarta.persistence.Column(name="_id")
+          type: integer
+          format: int64
+        charges:
+          x-field-extra-annotation: |-
+            @jakarta.persistence.Column(name="charges")
+            @jakarta.persistence.OneToMany(mappedBy = "info", cascade = jakarta.persistence.CascadeType.ALL)
+            @com.fasterxml.jackson.annotation.JsonManagedReference
+          type: array
+          items:
+            $ref: '#/components/schemas/LodgingRecord'
+            
+    FoodInformation:
+      x-class-extra-annotation: |-
+        @jakarta.persistence.Entity 
+        @jakarta.persistence.Table(name="_food_info")
+      type: object
+      properties:
+        id:
+          x-field-extra-annotation: |-
+            @jakarta.persistence.Id
+            @jakarta.persistence.GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY) 
+            @jakarta.persistence.Column(name="_id")
+          type: integer
+          format: int64
+        charges:
+          x-field-extra-annotation: |-
+            @jakarta.persistence.Column(name="charges")
+            @jakarta.persistence.OneToMany(mappedBy = "info", cascade = jakarta.persistence.CascadeType.ALL)
+            @com.fasterxml.jackson.annotation.JsonManagedReference
+          type: array
+          items:
+            $ref: '#/components/schemas/FoodRecord'
+        
+          
+    MiscellaneousInformation:
+      x-class-extra-annotation: |-
+        @jakarta.persistence.Entity 
+        @jakarta.persistence.Table(name="_misc_info")
+      type: object
+      properties:
+        id:
+          x-field-extra-annotation: |-
+            @jakarta.persistence.Id
+            @jakarta.persistence.GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY) 
+            @jakarta.persistence.Column(name="_id")
+          type: integer
+          format: int64
+        charges:
+          x-field-extra-annotation: |-
+            @jakarta.persistence.Column(name="charges")
+            @jakarta.persistence.OneToMany(mappedBy = "info", cascade = jakarta.persistence.CascadeType.ALL)
+            @com.fasterxml.jackson.annotation.JsonManagedReference
+          type: array
+          items:
+            $ref: '#/components/schemas/MiscellaneousRecord'
+            
+  securitySchemes:
+    api_key:
+      type: apiKey
+      name: api_key
+      in: header
