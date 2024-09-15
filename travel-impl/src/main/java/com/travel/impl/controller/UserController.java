@@ -59,7 +59,7 @@ public class UserController implements UserApi {
    }
 
    @Override
-   public ResponseEntity<ApiKeyResponse> userLoginPost(User user) {
+   public ResponseEntity<ApiKeyResponse> login(User user) {
       ApiKeyResponse out = userService.login(user);
       if(out == null) {
          return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
@@ -68,7 +68,7 @@ public class UserController implements UserApi {
    }
 
    @Override
-   public ResponseEntity<ApiKeyResponse> userRefreshTokenGet() {
+   public ResponseEntity<ApiKeyResponse> refreshToken() {
       ApiKeyResponse out = userService.refreshApiKey();
       if(out == null) {
          return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);

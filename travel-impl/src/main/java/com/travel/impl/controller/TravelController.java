@@ -1,5 +1,6 @@
 package com.travel.impl.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -7,11 +8,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.travel.api.TravelApi;
 import com.travel.impl.services.TravelService;
-import com.travel.impl.services.UserService;
 import com.travel.model.Travel;
 import com.travel.model.User;
 
@@ -23,12 +24,17 @@ public class TravelController implements TravelApi {
     @Autowired
     private TravelService travelService;
 
-    @Autowired
-    private UserService userService;
-
     @Override
     public ResponseEntity<List<Travel>> getAllTravel() {
-        return new ResponseEntity<>(travelService.getAllTravel(), HttpStatus.OK);
+        if(SecurityContextHolder.getContext().getAuthentication() != null) {
+            User loggedInUser = (User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        
+            log.info(loggedInUser.getUsername());
+            return new ResponseEntity<>(travelService.getAllTravelOfUser(loggedInUser), HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
+        }
     }
 
     @Override
@@ -36,12 +42,4 @@ public class TravelController implements TravelApi {
         return new ResponseEntity<>(travelService.createTravel(travel), HttpStatus.OK);
     }
 
-    @Override
-    public ResponseEntity<List<Travel>> getUserTravel(Long userId) {
-        if(userService.getUserById(userId) != null) {
-            return new ResponseEntity<>(travelService.getAllTravelOfUser(new User().id(userId)), HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-    }
 }

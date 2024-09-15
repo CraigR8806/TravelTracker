@@ -10,7 +10,7 @@ class ApiKeyRefreshCheck implements Middleware {
             !context.url.endsWith("refreshToken")) {
 
             if(!dateTimeIsPast(apiKeyContainer.refreshExpiry)) {
-                await userClient.userRefreshTokenGet().then((data) => {
+                await userClient.refreshToken().then((data) => {
                     if(data) {
                         apiKeyContainer = apiKeyContainerFromApiKeyResponse(data);
                     }
@@ -35,12 +35,17 @@ class ApiKeyRefreshCheck implements Middleware {
 let middlewareArr:Middleware[] = [new ApiKeyRefreshCheck()];
 
 
+interface ApiConfiguration {
+    basePath:string,
+    middleware:Middleware[]
+}
+
 const BASE_PATH:string | undefined = process.env.REACT_APP_API_BASE_PATH;
-const defaultConfig:Configuration = new Configuration({"basePath":BASE_PATH, "middleware": middlewareArr});
+const defaultConfig:ApiConfiguration = {"basePath":BASE_PATH || '', "middleware": middlewareArr};
 
 
-let userClient:UsersApi = new UsersApi(defaultConfig);
-let travelClient:TravelApi = new TravelApi(defaultConfig);
+let userClient:UsersApi = new UsersApi(new Configuration(defaultConfig));
+let travelClient:TravelApi = new TravelApi(new Configuration(defaultConfig));
 
 export interface ApiKeyContainer {
     apiKey:string,
@@ -71,6 +76,6 @@ export function loadApiKey(apiKeyResponse:ApiKeyResponse):void{
 }
 
 export function clearApiKey():void {
-    userClient = new UsersApi(defaultConfig);
-    travelClient = new TravelApi(defaultConfig);
+    userClient = new UsersApi(new Configuration(defaultConfig));
+    travelClient = new TravelApi(new Configuration(defaultConfig));
 }

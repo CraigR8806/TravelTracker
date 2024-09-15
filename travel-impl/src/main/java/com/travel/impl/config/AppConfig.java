@@ -15,6 +15,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.travel.impl.filters.AuthenticationFilter;
+import com.travel.impl.filters.CORSFilter;
 import com.travel.impl.services.UserService;
 
 @Configuration
@@ -40,7 +41,7 @@ public class AppConfig {
     protected CORSFilter corsFilter() {
         CorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
-        config.addAllowedOrigin("http://localhost:4200");
+        config.addAllowedOrigin("*");
         config.addAllowedMethod(HttpMethod.DELETE);
         config.addAllowedMethod(HttpMethod.GET);
         config.addAllowedMethod(HttpMethod.OPTIONS);

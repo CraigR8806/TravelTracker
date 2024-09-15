@@ -67,7 +67,7 @@ class LoginComp extends React.Component<LoginCompProps, LoginCompState> {
 
     private login = (event:React.SyntheticEvent<unknown>): void => {
         this.validateForm(()=> {
-            getUserClient().userLoginPost({
+            getUserClient().login({
                 "user":{
                     "username":this.state.username,
                     "password":this.state.password

@@ -80,6 +80,7 @@ paths:
     get:
       tags:
         - users
+      operationId: refreshToken
       summary: Refreshes a user api key.  API key must be provided in api_key header
       description: |-
         Attempts to refresh a user api key.  API key must be provided in api_key header
@@ -93,11 +94,14 @@ paths:
             application/xml:
               schema:
                 $ref: '#/components/schemas/ApiKeyResponse'
+      security:
+        - api_key: []
                 
   /user/login:
     post:
       tags:
         - users
+      operationId: login
       summary: Attempts to log in a user
       description: |-
         Attempts to a log a user in.  If successful, will return an API key
@@ -162,7 +166,10 @@ paths:
     get:
       tags:
         - travel
-      summary: Gets all travel records
+      summary: Gets all travel records restricted by the user associated with the api_key provided in header
+      description: |-
+        Gets all travel records restricted by the user associated with the api_key provided in header
+        If no api_key is provided, an empty list will be returned
       operationId: getAllTravel
       responses:
         '200':
@@ -212,38 +219,6 @@ paths:
           description: Invalid Travel object supplied
         '422':
           description: Validation exception
-      security:
-        - api_key: []
-
-  /travel/{userId}:
-    get:
-      tags:
-        - travel
-      summary: Returns a list of all travel records linked to a user
-      description: Returns a list of all travel records linked to a user
-      operationId: getUserTravel
-      parameters:
-        - name: userId
-          in: path
-          description: The user Id
-          required: true
-          schema:
-            type: integer
-            format: int64
-      responses:
-        '200':
-          description: successful operation
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Travel'       
-            application/xml:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Travel' 
       security:
         - api_key: []
   
@@ -320,6 +295,10 @@ components:
             @jakarta.persistence.Column(name="_id")
           type: integer
           format: int64
+        country:
+          type: string
+        state:
+          type: string
         location:
           type: string
         dateStart:
