@@ -20,6 +20,7 @@ export function getLoggedInUser():User{
     if(user) {
         loadApiKey(apiKeyResponseFromUser(user));
     } else {
+        clearApiKey();
         return {"username":""};
     }
     
