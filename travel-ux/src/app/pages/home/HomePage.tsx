@@ -1,9 +1,7 @@
 import './HomePage.css';
 
-import Container from 'react-bootstrap/Container';
-
 import { CesiumMovementEvent, GeoJsonDataSource, Viewer, EventTarget, RootEventTarget} from 'resium';
-import { Color, Ion  } from 'cesium';
+import { Color, ColorMaterialProperty, Entity, EntityCollection, PolygonGraphics, GeoJsonDataSource as GeoJsonDataSource_2, Ion, Material, Primitive } from 'cesium';
 
 import countries from '../../../resources/countries.json'
 import usStates from '../../../resources/us-states.json'
@@ -21,7 +19,9 @@ interface HomePageProps {
 }
 interface HomePageState {
   records:Record[],
-  user:User
+  user:User,
+  selectedEntity:EntityCollection|undefined,
+  loadedEntities:Entity[]
 }
 
 interface Record {
@@ -37,39 +37,43 @@ class HomePage extends React.Component<HomePageProps, HomePageState> {
   state:HomePageState = {
     records:[],
     user:{"username":""},
+    selectedEntity:undefined,
+    loadedEntities:[]
   }
 
   checkClickMainViewer = (movement: CesiumMovementEvent, target: RootEventTarget):void => {
     if(!target) {
-      let recordsTmp:Record[] = this.state.records;
-      let alreadySelectedItem = recordsTmp[recordsTmp.findIndex(record=>record.selected)];
-      if(alreadySelectedItem){
-        recordsTmp[recordsTmp.findIndex(record=>record.selected)].selected = false;
-      }
-      this.setState({
-        "records":[...recordsTmp]
-      });
+      this.state.records.forEach(record=>record.selected = false);
+      this.state.loadedEntities.forEach(unselectedEntity=> {
+        if(unselectedEntity.polygon) {
+          unselectedEntity.polygon.material = new ColorMaterialProperty(Color.YELLOW.withAlpha(0.2));
+        }
+      })
     }
   }
 
   selectCountry(selectedId:string):void {
-    let recordsTmp:Record[] = this.state.records;
-    let alreadySelectedItem = recordsTmp[recordsTmp.findIndex(record=>record.selected)];
-    if(alreadySelectedItem){
-      recordsTmp[recordsTmp.findIndex(record=>record.selected)].selected = false;
-    }
-    
-    recordsTmp[recordsTmp.findIndex(record=>record.boundary[0].id === selectedId)].selected = true;
-    console.log(recordsTmp);
-
-    this.setState({"records":recordsTmp});
+    this.state.records.forEach(record=>record.boundary[0].id === selectedId?record.selected = true:record.selected = false);
   }
 
   entityClick = (movement: CesiumMovementEvent, target: EventTarget):void => 	{
 
     let selectedId:string = target.id.id.split("_")[0];
-    
+
+    this.state.loadedEntities.filter(entity=>entity.id.split("_")[0] !== selectedId).forEach(unselectedEntity=> {
+      if(unselectedEntity.polygon) {
+        unselectedEntity.polygon.material = new ColorMaterialProperty(Color.YELLOW.withAlpha(0.2));
+      }
+    })
+
+    this.state.loadedEntities.filter(entity=>entity.id.split("_")[0] === selectedId).forEach(selectedEntity=>{
+      if(selectedEntity.polygon) {
+        selectedEntity.polygon.material = new ColorMaterialProperty(Color.BLUE.withAlpha(0.2));
+      }
+    })
     this.selectCountry(selectedId);
+    console.log(this.state.loadedEntities.length);
+    
     
   }
 
@@ -99,13 +103,18 @@ class HomePage extends React.Component<HomePageProps, HomePageState> {
       });
     }
   }
-  
+
+  entityLoad(source:GeoJsonDataSource_2) {
+
+    this.state.loadedEntities.push(...source.entities.values)
+  }
 
 
   render() {
 
     return (
-      <Container>
+      <>
+      {/* <Container> */}
         
           <Viewer 
             animation={false} 
@@ -117,10 +126,11 @@ class HomePage extends React.Component<HomePageProps, HomePageState> {
             onClick={this.checkClickMainViewer}
           >
             {this.state.records.map((record)=> (
-              <GeoJsonDataSource onClick={this.entityClick} fill={record.selected?new Color(0,0,1,0.3):new Color(1,1,0,0.3)} stroke={record.selected?Color.ORANGE:Color.YELLOW} data={featureCollectionFromListOfFeatures(record.boundary)} />
+              <GeoJsonDataSource onClick={this.entityClick} fill={Color.YELLOW.withAlpha(0.2)} onLoad={(entity)=>this.entityLoad(entity)} key={record.boundary[0].id} data={featureCollectionFromListOfFeatures(record.boundary)}/>
             ))}
           </Viewer>
-      </Container>
+      {/* </Container> */}
+    </>
     );
   }
 }

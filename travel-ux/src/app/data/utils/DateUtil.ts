@@ -16,3 +16,7 @@ export function dateTimeIsPast(date:Date) : boolean {
     let dateNow:Date = getUtcNow();
     return date.getTime() <= dateNow.getTime();
 }
+
+export function dateTimeStrIsPast(date:string) : boolean {
+    return dateTimeIsPast(dateFromString(date));
+}
