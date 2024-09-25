@@ -36,13 +36,20 @@ class App extends React.Component<AppProps, AppState> {
   render(){
     return (
       <Router>
-        <Navigation parentRef={this}/>
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/login" element={<Login parentRef={this} />} />
-          <Route path="/settings" element={<Settings/>}/>
-          <Route path="/travel/fromFile" element={<TravelFromFile/>}/>
-        </Routes>
+        <div className="mainContainer">
+          <div className="navContainer">
+            <Navigation parentRef={this}/>
+          </div>
+          <div className="routeContainer">
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/login" element={<Login parentRef={this} />} />
+            <Route path="/settings" element={<Settings/>}/>
+            <Route path="/travel/fromFile" element={<TravelFromFile/>}/>
+          </Routes>
+          </div>
+        </div>
+        
       </Router>
     );
   } 

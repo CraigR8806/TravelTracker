@@ -7,9 +7,14 @@ function getUtcNow() : Date {
     return new Date(now_utc);
 }
 
-export function dateFromString(dateStr:string) : Date {
-    return new Date(dateStr);
+export function dateFromString(dateStr:string|undefined) : Date {
+    if(dateStr){
+        return new Date(dateStr);
+    } else {
+        return new Date();
+    }
 }
+    
 
 
 export function dateTimeIsPast(date:Date) : boolean {

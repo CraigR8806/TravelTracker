@@ -1,4 +1,20 @@
 body {
   background-color:#330036 !important;
   margin:0px;
+  height:100%;
+}
+
+.mainContainer {
+  display:flex;
+  flex-flow:column;
+  height:100vh;
+}
+
+.navContainer {
+  flex:0 1 auto;
+}
+
+.routeContainer {
+  flex: 1 1 auto;
+  overflow-y:auto;
 }

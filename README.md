@@ -1,6 +1,8 @@
 # TravelTracker
 A web application to display historical travel grouped by users.  Users can decide what other users to share their travel with
 
+![alt text](media/Image.png)
+
 
 Requirements for the deploy script at this base level of the project are
 <ul>

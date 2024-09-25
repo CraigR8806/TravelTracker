@@ -303,10 +303,8 @@ components:
           type: string
         dateStart:
           type: string
-          format: date-time
         dateEnd:
           type: string
-          format: date-time
         transportationInformation:
           x-field-extra-annotation: |-
             @jakarta.persistence.OneToOne(cascade = jakarta.persistence.CascadeType.ALL)

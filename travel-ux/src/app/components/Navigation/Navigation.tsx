@@ -9,6 +9,7 @@ import React from 'react';
 import { logout } from '../../data/services/UserService';
 import App from '../../../App';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
+import "./Navigation.css";
 
 interface NavigationCompProps {
     navigation:NavigateFunction,
@@ -36,12 +37,11 @@ class NavigationComp extends React.Component<NavigationCompProps, NavigationComp
 
 
     logoutUser(me:NavigationComp){
-        console.log(this);
+        logout();
         me.parentRef.setState({
             "loggedIn":false,
             "user":{"username":''}
         }, () => {
-            logout();
             this.navigation("/");
         });
     }
