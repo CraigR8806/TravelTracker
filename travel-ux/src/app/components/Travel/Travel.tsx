@@ -1,5 +1,3 @@
-import React from 'react';
-
 import './Travel.css';
 
 import { Travel as TravelData } from '../../data/generated/models/Travel';
@@ -8,6 +6,11 @@ import TabBar from './TabBar/TabBar';
 import InfoIcon from '../Icons/InfoIcon/InfoIcon';
 import MoneyIcon from '../Icons/MoneyIcon/MoneyIcon';
 import StatsIcon from '../Icons/StatsIcon/StatsIcon';
+import TravelPanelProps from './TravelPanel/travelpanel';
+import ChargesPanel from './TravelPanel/ChargesPanel/ChargesPanel';
+import InfoPanel from './TravelPanel/InfoPanel/InfoPanel';
+import StatsPanel from './TravelPanel/StatsPanel/StatsPanel';
+import React, { ReactElement } from 'react';
 
 
 interface TravelProps  {
@@ -19,6 +22,10 @@ interface TravelState  {
 }
 
 class Travel extends React.Component<TravelProps, TravelState> {
+
+    private panels:(()=>ReactElement<TravelPanelProps>)[] = [()=><InfoPanel travelData={this.props.travelRecords}/>,
+                                                             ()=><ChargesPanel travelData={this.props.travelRecords}/>,
+                                                             ()=><StatsPanel  travelData={this.props.travelRecords}/>];
 
     constructor(props:TravelProps) {
         super(props);
@@ -39,7 +46,7 @@ class Travel extends React.Component<TravelProps, TravelState> {
         return(
             <Container className="travelInfoAndTabPanel">
                 <Row className="travelInfoPanel">
-
+                    {this.panels[this.state.selectedTab]()}
                 </Row>
                 <Row className="travelInfoTabRow">
                     <TabBar tabSelected={this.tabSelected}

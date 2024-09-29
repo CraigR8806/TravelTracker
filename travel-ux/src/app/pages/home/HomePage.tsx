@@ -69,6 +69,7 @@ class HomePage extends React.Component<HomePageProps, HomePageState> {
     let selectedId = target.id.id.split("_")[0];
     let travelRecordsTmp = this.state.records.filter(record=>record.boundary[0].id === selectedId)
         .flatMap(record=>record.travelRecords).sort((a,b)=>dateFromString(a.dateStart) > dateFromString(b.dateStart)?1:-1);
+
     this.setState({"selectedEntityId":selectedId, "selectedTravel":travelRecordsTmp}, ()=>{
       this.timelinePopulate(this.state.selectedTravel);
     });
@@ -79,6 +80,7 @@ class HomePage extends React.Component<HomePageProps, HomePageState> {
     if(items.items.length > 0) {
       let selectedEntityIdTmp = this.state.records.find(record=>record.travelRecords.findIndex(travel=>travel.id === items.items[0]) !== -1)?.boundary[0].id;
       let selectedTravelTmp = [this.state.records.flatMap(record=>record.travelRecords).filter(travel=>travel.id === items.items[0])[0]].sort((a,b)=>dateFromString(a.dateStart) > dateFromString(b.dateStart)?1:-1)
+      
       this.setState({"selectedEntityId":selectedEntityIdTmp, "selectedTravelId":selectedTravelTmp[0].id, "selectedTravel":selectedTravelTmp}, ()=>{
         this.timelinePopulate(this.state.selectedTravel);
       })
@@ -150,7 +152,7 @@ class HomePage extends React.Component<HomePageProps, HomePageState> {
     console.log("ComponoentDidMount");
     
     if(getLoggedInUser().username !== "") {
-        if(this.state.user.username !== getLoggedInUser().username) {
+      if(this.state.user.username !== getLoggedInUser().username) {
         this.setState({"user":getLoggedInUser()}, ()=> {
           getTravelClient().getAllTravel().then(data=>{
             if(data && data.length > 0) {
