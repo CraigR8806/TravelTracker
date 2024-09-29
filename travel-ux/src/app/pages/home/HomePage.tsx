@@ -9,14 +9,13 @@ import { featureCollectionFromListOfFeatures } from '../../data/utils/GeoJsonUti
 import { getLoggedInUser, logout } from '../../data/services/UserService';
 import { Travel as TravelData, User } from '../../data/generated';
 import { getTravelClient } from '../../data/api/ApiAccess';
-import Travel from './Travel/Travel';
+import Travel from '../../components/Travel/Travel';
 import Timeline from 'react-lms-vis-timeline';
 
 import './HomePage.css';
 import { dateFromString } from 'src/app/data/utils/DateUtil';
 import { TimelineGroup, TimelineItem } from 'src/app/data/types/timeline';
 import { Col, Container, Row } from 'react-bootstrap';
-
 
 interface HomePageProps {
   
@@ -227,7 +226,7 @@ class HomePage extends React.Component<HomePageProps, HomePageState> {
               <div className="travelPanel">
                     <div className="travelRecordPanel">
                         {this.state.selectedTravel.map(travel=>(
-                            <div className="travelRecord">
+                            <div onClick={e => (this.setState({"selectedTravel":[travel], "selectedEntityId": this.state.records.find(record=>record.travelRecords.findIndex(tr=>tr.id === travel.id) !== -1)?.boundary[0].id}, ()=>this.timelinePopulate([travel])))} className="travelRecord">
                                 <div>{travel.country}</div>
                                 <div>{dateFromString(travel.dateStart?.toString()).toISOString()}</div>
                                 <div>{travel.dateEnd?.toString()}</div>
@@ -235,6 +234,7 @@ class HomePage extends React.Component<HomePageProps, HomePageState> {
                             </div>
                         ))}
                     </div>
+                    <Travel travelRecords={this.state.selectedTravel}/>
                 </div>
             </div>
             <div className="mapContainer">

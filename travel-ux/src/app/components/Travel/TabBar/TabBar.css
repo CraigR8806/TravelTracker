@@ -1,0 +1,63 @@
+:root {
+  --tab-slider-position: 0%;
+  --tab-background-color: #fff;
+  --tab-svg-color: #fff;
+  --tab-highlight-background-color: #fff;
+  --tab-highlight-svg-color: #fff;
+}
+
+.tabBarListTag {
+  display: flex;
+  gap: 0 1rem;
+  margin: 0;
+  position: relative;
+  border-radius: 0.5rem;
+  list-style: none;
+  background-color: var(--tab-background-color);
+  isolation: isolate;
+  padding-top: 0.5rem;
+  padding-right: 0.5rem;
+  padding-bottom: 0.3rem;
+  padding-left: 0.5rem !important;
+}
+
+.tabBarListTag:after {
+  content: "";
+  display: block;
+  width: var(--width, 0%);
+  height: 100%;
+  position: absolute;
+  left: var(--tab-slider-position);
+  top: 0;
+  background-color: var(--tab-highlight-background-color);
+  border-radius: 0.5rem;
+  z-index: -1;
+  transition: left 0.2s ease;
+}
+
+.tabBarRadioTag {
+  display: none;
+}
+
+.tabBarSvgTag {
+  height: 2rem;
+  width: 2rem;
+  fill: var(--tab-svg-color);
+  transition: fill 0.2s ease;
+}
+
+.tabBarRadioTag:checked + .tabBarLabelTag .tabBarSvgTag {
+  fill:var(--tab-highlight-svg-color);
+}
+
+.tabBarContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  gap: 1rem;
+  background-color: #2F394D;
+  color: #96A0A2;
+  font-family: sans-serif;
+  padding-bottom:10px;
+}

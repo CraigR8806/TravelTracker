@@ -20,10 +20,13 @@
 
 .travelPanelContainer {
     width:100%;
+    height:100%;
+    padding-left:0px !important;
+    padding-right:0px !important;
 }
 
-.mapContainer {
-
+.travelPanelInfoContainer {
+    height:100%;
 }
 
 .travelAndMapContainer {
@@ -38,6 +41,16 @@
 
     margin-top:10px;
 }
+.travelInfoAndTabPanel {
+    background-color:#2F394D;
+    width:80%;
+    display:flex;
+    flex-direction:column;
+}
+.travelInfoTabRow {
+    padding-top:10px;
+}
+
 .userSelector {
     width:20%;
     height:100%;
@@ -78,7 +91,6 @@
     background-color:#2F394D;
     color:#96A0A2;
     display:flex;
-    flex-direction:column;
 }
 
 .travelRecord {
@@ -107,6 +119,9 @@
     overflow-y:auto;
     min-height:100%;
     border-right: 1px #96A0A2 solid;
+}
+.travelInfoPanel {
+    flex: 1 0 auto;
 }
 
 .vis-item {
