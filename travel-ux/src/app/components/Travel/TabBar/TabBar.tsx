@@ -1,7 +1,6 @@
 import { Component } from 'react';
 import './TabBar.css';
 import IconProps from '../../Icons/IconProps';
-import { delay } from 'src/app/data/utils/Util';
 
 
 interface TabBarProps {
@@ -35,7 +34,6 @@ class TabBar extends Component<TabBarProps, TabBarState> {
     private tabSelected = (index:number)=>{
         this.setState({selectedTab:index},()=>{
             this.props.tabSelected(index);
-            delay(1).then(()=>this.markRadioAsChecked());
         });
     }
 
@@ -46,8 +44,11 @@ class TabBar extends Component<TabBarProps, TabBarState> {
             thisRadio.checked = 'true';
     }
 
-    componentDidMount() {
+    componentDidUpdate() {
         this.markRadioAsChecked();
+    }
+
+    componentDidMount() {
         document.documentElement.style.setProperty('--tab-background-color', this.props.backgroundColor);
         document.documentElement.style.setProperty('--tab-svg-color', this.props.svgColor);
         document.documentElement.style.setProperty('--tab-highlight-background-color', this.props.highlightBackgroundColor);
