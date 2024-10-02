@@ -1,6 +1,7 @@
 import { Component } from 'react';
 import './TabBar.css';
 import IconProps from '../../Icons/IconProps';
+import { delay } from 'src/app/data/utils/Util';
 
 
 interface TabBarProps {
@@ -33,18 +34,13 @@ class TabBar extends Component<TabBarProps, TabBarState> {
 
     private tabSelected = (index:number)=>{
         this.setState({selectedTab:index},()=>{
-            this.markRadioAsChecked();
             this.props.tabSelected(index);
+            delay(1).then(()=>this.markRadioAsChecked());
         });
     }
 
     private markRadioAsChecked() {
         document.documentElement.style.setProperty('--tab-slider-position', this.state.highlightWidth * this.state.selectedTab + "%");
-        document.documentElement.style.setProperty('--tab-background-color', this.props.backgroundColor);
-        document.documentElement.style.setProperty('--tab-svg-color', this.props.svgColor);
-        document.documentElement.style.setProperty('--tab-highlight-background-color', this.props.highlightBackgroundColor);
-        document.documentElement.style.setProperty('--tab-highlight-svg-color', this.props.highlightSvgColor);
-
         let thisRadio:any = document.getElementById("tabBarItem-" + this.state.selectedTab);
         if(thisRadio)
             thisRadio.checked = 'true';
@@ -52,6 +48,10 @@ class TabBar extends Component<TabBarProps, TabBarState> {
 
     componentDidMount() {
         this.markRadioAsChecked();
+        document.documentElement.style.setProperty('--tab-background-color', this.props.backgroundColor);
+        document.documentElement.style.setProperty('--tab-svg-color', this.props.svgColor);
+        document.documentElement.style.setProperty('--tab-highlight-background-color', this.props.highlightBackgroundColor);
+        document.documentElement.style.setProperty('--tab-highlight-svg-color', this.props.highlightSvgColor);
     }
 
     render() {
@@ -59,16 +59,16 @@ class TabBar extends Component<TabBarProps, TabBarState> {
         
         return (
             <div className="tabBarContainer">
-                <ul style={{"--width" : this.state.highlightWidth + "%"} as React.CSSProperties} className="tabBarListTag">
+                <div style={{"--width" : this.state.highlightWidth + "%"} as React.CSSProperties} className="tabBarListTag">
                     {this.props.children.map((Icon, i)=>(
-                        <li>
+                        <div key={Math.random()*9999}>
                             <input className="tabBarRadioTag" type="radio" name={this.state.tabGroupName} id={"tabBarItem-" + i}/>
                             <label onClick={()=>this.tabSelected(i)} className="tabBarLabelTag">
                                 <Icon svgClassName='tabBarSvgTag' />
                             </label>
-                        </li>
+                        </div>
                     ))}
-                </ul>
+                </div>
             </div>
         );
     }

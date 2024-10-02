@@ -9,17 +9,16 @@ import './Login.css';
 import { Tabs, Tab, Button } from 'react-bootstrap';
 import { getUserClient, loadApiKey } from '../../data/api/ApiAccess';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
-import { setLoggedInUser } from '../../data/services/UserService';
-import App from '../../../App';
+import { login, registerAsUserConsumer, retrieveUser } from '../../data/services/UserService';
+import { UserConsumerState } from 'src/app/data/providers/UserProvider/UserProvider';
 
 
 
 interface LoginCompProps {
     navigation:NavigateFunction,
-    parentRef:App
 }
 
-interface LoginCompState {
+interface LoginCompState extends UserConsumerState {
     username:string,
     email:string,
     password:string,
@@ -31,26 +30,44 @@ interface LoginCompState {
 }
 
 interface LoginProps {
-    parentRef:App
+
 }
 
 
 function Login(props:LoginProps) {
     const navigation = useNavigate();
 
-    return <LoginComp {...props} parentRef={props.parentRef} navigation={navigation} />;
+    return <LoginComp {...props} navigation={navigation} />;
 }
 
 class LoginComp extends React.Component<LoginCompProps, LoginCompState> {
 
     private navigate:NavigateFunction = this.props.navigation;
-    private parentRef:App = this.props.parentRef;
+
+    constructor(props:LoginCompProps) {
+        super(props);
+        this.state = 
+            {
+                user:retrieveUser(),
+                userConsumerKey : registerAsUserConsumer(this, null),
+                username:'',
+                email:'',
+                password:'',
+                passwordVeri:'',
+                passwordValid:true,
+                usernameValid:true,
+                emailValid:true,
+                loginActive:true
+            };
+    }
 
     private navigateHome = () => {
         this.navigate("/");
     }
 
-    private clearedState:LoginCompState = {
+    clearState = () => {
+        this.setState({user:retrieveUser(),
+        userConsumerKey:this.state.userConsumerKey || null,
         username:'',
         email:'',
         password:'',
@@ -58,11 +75,10 @@ class LoginComp extends React.Component<LoginCompProps, LoginCompState> {
         passwordValid:true,
         usernameValid:true,
         emailValid:true,
-        loginActive:true
+        loginActive:true});
     }
 
 
-    state:LoginCompState = this.clearedState;
     
 
     private login = (event:React.SyntheticEvent<unknown>): void => {
@@ -75,19 +91,13 @@ class LoginComp extends React.Component<LoginCompProps, LoginCompState> {
             }).then(data => {
                 if(data) {
                     loadApiKey(data);
-                    setLoggedInUser({
+                    login({
                         "username":this.state.username,
                         "activeApiKey":data.apiKey,
                         "apiKeyExpires":data.apiKeyExpiration,
                         "apiKeyRefreshExpiration":data.apiKeyRefreshExpiration
                     });
-                    this.parentRef.setState({
-                        "loggedIn":true, 
-                        "user":{"username":this.state.username}
-                        }, ()=> {
-                            this.navigateHome();
-                        }
-                    );
+                    this.navigateHome();
                 }
             }).catch(()=>{
                 this.setState({
@@ -159,7 +169,7 @@ class LoginComp extends React.Component<LoginCompProps, LoginCompState> {
 
     private makeLoginActive = (afterActive:(()=>void)|undefined|null):void => {
         if(!this.state.loginActive) {
-            this.setState(this.clearedState);
+            this.clearState();
             if(afterActive){
                 afterActive();
             }
@@ -168,7 +178,7 @@ class LoginComp extends React.Component<LoginCompProps, LoginCompState> {
     }
     private makeCreateActive = (afterActive:(()=>void)|undefined|null):void => {
         if(this.state.loginActive) {
-            this.setState(this.clearedState);
+            this.clearState();
             if(afterActive){
                 afterActive();
             }
