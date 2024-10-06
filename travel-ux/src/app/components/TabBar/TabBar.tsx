@@ -1,6 +1,6 @@
 import { Component } from 'react';
 import './TabBar.css';
-import IconProps from '../../Icons/IconProps';
+import IconProps from '../Icons/IconProps';
 
 
 interface TabBarProps {

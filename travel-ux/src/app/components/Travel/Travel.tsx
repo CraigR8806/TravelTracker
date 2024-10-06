@@ -2,7 +2,7 @@ import './Travel.css';
 
 import { Travel as TravelData } from '../../data/generated/models/Travel';
 import { Container, Row } from 'react-bootstrap';
-import TabBar from './TabBar/TabBar';
+import TabBar from '../TabBar/TabBar';
 import InfoIcon from '../Icons/InfoIcon/InfoIcon';
 import MoneyIcon from '../Icons/MoneyIcon/MoneyIcon';
 import StatsIcon from '../Icons/StatsIcon/StatsIcon';
@@ -37,9 +37,7 @@ class Travel extends React.Component<TravelProps, TravelState> {
     }
 
     tabSelected = (index:number) => {
-        this.setState({"selectedTab":index}, ()=>{
-            console.log(this.state.selectedTab);
-        });
+        this.setState({"selectedTab":index});
     }
 
     render(){

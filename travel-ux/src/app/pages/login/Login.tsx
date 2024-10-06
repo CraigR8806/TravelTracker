@@ -1,16 +1,14 @@
 
 
-import Container from 'react-bootstrap/Container';
-
 import React from 'react';
-import Form from 'react-bootstrap/esm/Form';
 
 import './Login.css';
-import { Tabs, Tab, Button } from 'react-bootstrap';
-import { getUserClient, loadApiKey } from '../../data/api/ApiAccess';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
-import { login, registerAsUserConsumer, retrieveUser } from '../../data/services/UserService';
-import { UserConsumerState } from 'src/app/data/providers/UserProvider/UserProvider';
+import { AppBar, Box, Container, Tab, Tabs } from '@mui/material';
+import TabPanel from 'src/app/components/TabPanel/TabPanel';
+import LoginPanel from './LoginPanel/LoginPanel';
+import { User } from 'src/app/data/generated';
+import RegisterPanel from './RegisterPanel/RegisterPanel';
 
 
 
@@ -18,14 +16,8 @@ interface LoginCompProps {
     navigation:NavigateFunction,
 }
 
-interface LoginCompState extends UserConsumerState {
-    username:string,
-    email:string,
-    password:string,
-    passwordVeri:string,
-    passwordValid:boolean,
-    usernameValid:boolean,
-    emailValid:boolean,
+interface LoginCompState {
+    autofillUser:string | undefined,
     loginActive:boolean,
 }
 
@@ -46,228 +38,61 @@ class LoginComp extends React.Component<LoginCompProps, LoginCompState> {
 
     constructor(props:LoginCompProps) {
         super(props);
-        this.state = 
-            {
-                user:retrieveUser(),
-                userConsumerKey : registerAsUserConsumer(this, null),
-                username:'',
-                email:'',
-                password:'',
-                passwordVeri:'',
-                passwordValid:true,
-                usernameValid:true,
-                emailValid:true,
-                loginActive:true
-            };
+        this.state = {autofillUser: undefined, loginActive:true};
+        this.onLogin = this.onLogin.bind(this);
+        this.onRegister = this.onRegister.bind(this);
     }
 
     private navigateHome = () => {
         this.navigate("/");
     }
 
-    clearState = () => {
-        this.setState({user:retrieveUser(),
-        userConsumerKey:this.state.userConsumerKey || null,
-        username:'',
-        email:'',
-        password:'',
-        passwordVeri:'',
-        passwordValid:true,
-        usernameValid:true,
-        emailValid:true,
-        loginActive:true});
+    handleSelectedTabChange = (event: React.SyntheticEvent, newValue: number) => {
+        this.setState({loginActive: newValue===0});
+    };
+
+    onLogin(user:User) {
+        this.navigateHome();
     }
 
-
-    
-
-    private login = (event:React.SyntheticEvent<unknown>): void => {
-        this.validateForm(()=> {
-            getUserClient().login({
-                "user":{
-                    "username":this.state.username,
-                    "password":this.state.password
-                }
-            }).then(data => {
-                if(data) {
-                    loadApiKey(data);
-                    login({
-                        "username":this.state.username,
-                        "activeApiKey":data.apiKey,
-                        "apiKeyExpires":data.apiKeyExpiration,
-                        "apiKeyRefreshExpiration":data.apiKeyRefreshExpiration
-                    });
-                    this.navigateHome();
-                }
-            }).catch(()=>{
-                this.setState({
-                    "usernameValid": false,
-                    "passwordValid": false
-                })
-            });
-        });
-    }
-
-    private createUser = (event:React.SyntheticEvent<unknown>): void => {
-        this.validateForm(() => {
-            getUserClient().upsertUser({
-                "user":{
-                    "username":this.state.username,
-                    "password":this.state.password,
-                    "email":this.state.email,
-                }
-            }).then((data)=>{
-                if(data) {
-                    this.makeLoginActive(()=>{
-                        this.setState({"username":data.username});
-                    });
-                }
-            }).catch(()=> {
-                this.setState({
-                    "usernameValid": false,
-                    "passwordValid": false,
-                    "emailValid":false
-                })
-            });
-        });
-    }
-
-    private validateForm(action:()=>void) {
-        let unValid = true;
-        let eValid = true;
-        let pValid = this.state.passwordValid;
-        if(this.state.username === ''){
-            unValid = false;
-        }
-        if(!this.state.loginActive && this.state.email === '') {
-            eValid = false;
-        }
-        if(this.state.password === '') {
-            pValid = false;
-        }
-
-        this.setState({
-            "usernameValid":unValid,
-            "emailValid":eValid,
-            "passwordValid":pValid
-        }, () => {
-            if(this.state.usernameValid &&
-                this.state.emailValid &&
-                this.state.passwordValid) {
-                action();
-            }
-        });
-    }
-
-    private handleTabSelect = (eventKey:string | null, event:React.SyntheticEvent<unknown>):void => {
-        if(eventKey === "login"){
-            this.makeLoginActive(null);
-        } else if (eventKey === "create") {
-            this.makeCreateActive(null);
-        }
-    }
-
-    private makeLoginActive = (afterActive:(()=>void)|undefined|null):void => {
-        if(!this.state.loginActive) {
-            this.clearState();
-            if(afterActive){
-                afterActive();
-            }
-        }
-        this.setState({"loginActive":true});
-    }
-    private makeCreateActive = (afterActive:(()=>void)|undefined|null):void => {
-        if(this.state.loginActive) {
-            this.clearState();
-            if(afterActive){
-                afterActive();
-            }
-        }
-        this.setState({"loginActive":false});
-    }
-
-    private handleUsernameChange = (event:React.ChangeEvent<HTMLInputElement>):void => {
-        event.preventDefault();
-        this.setState({"username":event.target.value});
-    }
-    private handleEmailChange = (event:React.ChangeEvent<HTMLInputElement>):void => {
-        event.preventDefault();
-        this.setState({"email":event.target.value});
-    }
-    private handlePasswordChange = (event:React.ChangeEvent<HTMLInputElement>):void => {
-        event.preventDefault();
-        this.setState({"password":event.target.value}, () => {
-            if(!this.state.loginActive) {
-                this.setState({passwordValid:this.state.password === this.state.passwordVeri})
-            }
-        });
-    }
-    private handlePasswordVeriChange = (event:React.ChangeEvent<HTMLInputElement>):void => {
-        event.preventDefault();
-        this.setState({"passwordVeri":event.target.value}, ()=> {
-            if(!this.state.loginActive){
-                this.setState({passwordValid:this.state.password === this.state.passwordVeri})
-            }
+    onRegister(user:User) {
+        this.setState({autofillUser: user.username}, ()=>{
+            this.setState({loginActive: true});
         });
     }
 
     render() {
+        const loginActive = this.state.loginActive;
         return (
-        <Container>
-            <div className="loginContainer">
-                <div className="loginWindow">
-                    <Tabs
-                        defaultActiveKey="login"
-                        id="fill-tab-example"
-                        className="mb-3"
-                        fill
-                        onSelect={this.handleTabSelect}
-                        >
-                        <Tab active={this.state.loginActive} eventKey="login" title="Login">
-                            <Form>
-                                <Form.Group className="mb-3" controlId="formGroupUserName">
-                                    <Form.Label>User Name</Form.Label>
-                                    <Form.Control type="username" onChange={this.handleUsernameChange} value={this.state.username} isInvalid={!this.state.usernameValid} placeholder="Enter User Name" />
-                                </Form.Group>
-                                <Form.Group className="mb-3" controlId="formGroupPassword">
-                                    <Form.Label>Password</Form.Label>
-                                    <Form.Control type="password" onChange={this.handlePasswordChange} isInvalid={!this.state.passwordValid} placeholder="Password" />
-                                </Form.Group>
-
-                                <Button onClick={this.login} className="mb-3 loginButton">Login</Button>
-                            </Form>
-                        </Tab>
-                        <Tab active={!this.state.loginActive} eventKey="create" title="Create Account">
-                            <Form>
-                                <Form.Group className="mb-3" controlId="formGroupUserName">
-                                    <Form.Label>User Name</Form.Label>
-                                    <Form.Control type="username" onChange={this.handleUsernameChange} isInvalid={!this.state.usernameValid} placeholder="Enter User Name" />
-                                </Form.Group>
-                                <Form.Group className="mb-3" controlId="formGroupEmail">
-                                    <Form.Label>Email Address</Form.Label>
-                                    <Form.Control type="username" onChange={this.handleEmailChange} isInvalid={!this.state.emailValid} placeholder="Enter Email Address" />
-                                </Form.Group>
-                                <Form.Group className="mb-3" controlId="formGroupPassword">
-                                    <Form.Label>Enter Password</Form.Label>
-                                    <Form.Control type="password" onChange={this.handlePasswordChange} isInvalid={!this.state.passwordValid} value={this.state.password} placeholder="Password" />
-                                </Form.Group>
-                                <Form.Group className="mb-3" controlId="formGroupPasswordVeri">
-                                    <Form.Label>Reenter Password</Form.Label>
-                                    <Form.Control type="password" onChange={this.handlePasswordVeriChange} isInvalid={!this.state.passwordValid} value={this.state.passwordVeri} placeholder="Reenter Password" />
-                                    <Form.Control.Feedback type="invalid">
-                                        Password fields must match
-                                    </Form.Control.Feedback>
-                                </Form.Group>
-
-                                <Button onClick={this.createUser} className="mb-3 loginButton">Register</Button>
-                            </Form>
-                        </Tab>
+            <Container>
+                <div className="loginContainer">
+                    <div className="loginWindow">
+                        <Box sx={{ bgcolor: 'background.paper' }}>
+                            <AppBar position="static">
+                                <Tabs
+                                    value={loginActive?0:1}
+                                    onChange={this.handleSelectedTabChange}
+                                    indicatorColor="secondary"
+                                    textColor="inherit"
+                                    variant="fullWidth"
+                                >
+                                    <Tab label="Login"/>
+                                    <Tab label="Register"/>
+                                </Tabs>
+                            </AppBar>
                         
-                    </Tabs>
-                </div>
-            </div>  
-        </Container>
-    );}
+                            <TabPanel selected={loginActive}>
+                                <LoginPanel autofillUsername={this.state.autofillUser} onLogin={this.onLogin} />
+                            </TabPanel>
+                            <TabPanel selected={!loginActive}>
+                                <RegisterPanel onRegister={this.onRegister} />
+                            </TabPanel>
+                        </Box>
+                    </div>
+                </div>  
+            </Container>
+        );
+    }
 }
 
 export default Login;
