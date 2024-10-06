@@ -15,9 +15,9 @@ import Timeline from 'react-lms-vis-timeline';
 import './HomePage.css';
 import { dateFromString } from 'src/app/data/utils/DateUtil';
 import { TimelineGroup, TimelineItem } from 'src/app/data/types/timeline';
-import { Col, Container, Row } from 'react-bootstrap';
 import { delay, unique } from 'src/app/data/utils/Util';
 import { UserConsumerState } from 'src/app/data/providers/UserProvider/UserProvider';
+import Grid from '@mui/material/Grid2';
 
 interface HomePageProps {
   
@@ -193,11 +193,11 @@ class HomePage extends React.Component<HomePageProps, HomePageState> {
         <div className="homepageContainer">
           <div className="timelineContainer">
             <div className="userSelector">
-              <Container>
-                <Row>
-                  <Col className="userSelectorHeader">User Travel Selector</Col>
-                </Row>
-              </Container>
+              <Grid container spacing={2}>
+                <Grid size={12}>
+                  <div className="userSelectorHeader">User Travel Selector</div>
+                </Grid>
+              </Grid>
             </div>
             <Timeline 
               ref={this.timelineReference}

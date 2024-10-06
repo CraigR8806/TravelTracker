@@ -1,7 +1,6 @@
 import './Travel.css';
 
 import { Travel as TravelData } from '../../data/generated/models/Travel';
-import { Container, Row } from 'react-bootstrap';
 import TabBar from '../TabBar/TabBar';
 import InfoIcon from '../Icons/InfoIcon/InfoIcon';
 import MoneyIcon from '../Icons/MoneyIcon/MoneyIcon';
@@ -11,6 +10,7 @@ import ChargesPanel from './TravelPanel/ChargesPanel/ChargesPanel';
 import InfoPanel from './TravelPanel/InfoPanel/InfoPanel';
 import StatsPanel from './TravelPanel/StatsPanel/StatsPanel';
 import React, { ReactElement } from 'react';
+import { Grid2 } from '@mui/material';
 
 
 interface TravelProps  {
@@ -42,11 +42,11 @@ class Travel extends React.Component<TravelProps, TravelState> {
 
     render(){
         return(
-            <Container className="travelInfoAndTabPanel">
-                <Row className="travelInfoPanel">
+            <Grid2 sx={{height:"100%"}} className="travelInfoAndTabPanel">
+                <Grid2 sx={{flexGrow:1}} size={12} className="travelInfoPanel">
                     {this.panels[this.state.selectedTab]()}
-                </Row>
-                <Row className="travelInfoTabRow">
+                </Grid2>
+                <Grid2 sx={{alignSelf:"flex-end", width:"100%"}} size={12} className="travelInfoTabRow">
                     <TabBar tabSelected={this.tabSelected}
                             backgroundColor={"#330036"}
                             svgColor={"#96A0A2"}
@@ -56,8 +56,8 @@ class Travel extends React.Component<TravelProps, TravelState> {
                         {MoneyIcon}
                         {StatsIcon}
                     </TabBar>
-                </Row>
-            </Container>
+                </Grid2>
+            </Grid2>
         );
     } 
 
